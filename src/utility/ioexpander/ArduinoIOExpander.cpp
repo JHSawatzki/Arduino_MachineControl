@@ -103,6 +103,18 @@ void ArduinoIOExpanderClass::initPins()
 {
 
     if (_tca.getAddress() == IO_ADD) {
+      set(IO_WRITE_CH_PIN_00, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_01, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_02, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_03, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_04, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_05, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_06, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_07, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_08, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_09, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_10, SWITCH_OFF);
+      set(IO_WRITE_CH_PIN_11, SWITCH_OFF);
       pinMode(IO_WRITE_CH_PIN_00, OUTPUT);
       pinMode(IO_WRITE_CH_PIN_01, OUTPUT);
       pinMode(IO_WRITE_CH_PIN_02, OUTPUT);
