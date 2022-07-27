@@ -31,7 +31,7 @@ public:
 		for (int i=0; i<3; i++) {
 			ch_sel[i] = (i == channel ? 1 : 0);
 		}
-		delay(150);
+		delayMicroseconds(150); //TODO possibly tune to 100 microseconds or below
 	}
 
 	/**
@@ -64,7 +64,7 @@ public:
 		digitalWrite(PA_6, HIGH);
 	}
 	MAX31865Class rtd = MAX31865Class(PA_6);
-	MAX31855Class tc = MAX31855Class(7);
+	MAX31855Class tc = MAX31855Class(PI_0);
 
 private:
 	mbed::DigitalOut ch_sel[3] = { mbed::DigitalOut(PD_6), mbed::DigitalOut(PI_4), mbed::DigitalOut(PG_10)};
