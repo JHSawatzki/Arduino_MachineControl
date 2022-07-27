@@ -149,7 +149,7 @@ void PCF8563TClass::setSeconds(uint8_t seconds) {
  */   
 uint8_t PCF8563TClass::getYears() {
   uint8_t years = readByte(PCF8563T_YEARS_REG);
-  return (years & 0x0F) + ((years >> 4)*10);
+  return (years & 0x0F) + ((years >> 4) * 10);
 }
 
 /**
@@ -173,7 +173,7 @@ uint8_t PCF8563TClass::getMonths() {
  */   
 uint8_t PCF8563TClass::getDays() {
   uint8_t days = readByte(PCF8563T_DAYS_REG) & 0x3F;
-  return (days & 0x0F) + ((days >> 4)*10);
+  return (days & 0x0F) + ((days >> 4) * 10);
 }
 
 /**
@@ -183,7 +183,7 @@ uint8_t PCF8563TClass::getDays() {
  */   
 uint8_t PCF8563TClass::getHours() {
   uint8_t hours = readByte(PCF8563T_HOURS_REG) & 0x3F;
-  return (hours & 0x0F) + ((hours >> 4)*10);
+  return (hours & 0x0F) + ((hours >> 4) * 10);
 }
 
 /**
@@ -193,7 +193,7 @@ uint8_t PCF8563TClass::getHours() {
  */   
 uint8_t PCF8563TClass::getMinutes() {
   uint8_t minutes = (readByte(PCF8563T_MINUTES_REG)) & 0x7F ;
-  return (minutes & 0x0F) + ((minutes >> 4)*10);
+  return (minutes & 0x0F) + ((minutes >> 4) * 10);
 }
 
 /**
@@ -203,7 +203,7 @@ uint8_t PCF8563TClass::getMinutes() {
  */   
 uint8_t PCF8563TClass::getSeconds() {
   uint8_t seconds = readByte(PCF8563T_VL_SECONDS_REG) & 0x7F;
-  return (seconds & 0x0F) + ((seconds >> 4)*10);
+  return (seconds & 0x0F) + ((seconds >> 4) * 10);
 }
 
 /**
@@ -266,7 +266,7 @@ void PCF8563TClass::setEpoch(uint8_t years, uint8_t months, uint8_t days, uint8_
   time.tm_mon = months - 1;
   time.tm_year = years + 100;  // year since 1900
 
-  _rtc_maketime(&time, &utcsec,RTC_FULL_LEAP_YEAR_SUPPORT);
+  _rtc_maketime(&time, &utcsec, RTC_FULL_LEAP_YEAR_SUPPORT);
   set_time(utcsec);
 }
 
