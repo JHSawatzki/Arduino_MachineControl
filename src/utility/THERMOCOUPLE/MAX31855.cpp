@@ -181,21 +181,21 @@ float MAX31855Class::readTemperature(int type)
     measuredTempInt = 0xFFFC0000 | ((rawword >> 18) & 0x00003FFFF);
   } else {
     // Positive value, just drop the lower 18 bits.
-    measuredTempInt = rawword>>18;
+    measuredTempInt = rawword >> 18;
   }
 
   // convert it to degrees
   measuredTemp = measuredTempInt * 0.25f;
 
   // sign extend cold junction temperature
-  measuredColdInt = (rawword>>4)&0xfff;
-  if (measuredColdInt&0x800) {
+  measuredColdInt = (rawword >>4) & 0xfff;
+  if (measuredColdInt & 0x800) {
     // Negative value, sign extend
     measuredColdInt |= 0xfffff000;
   }
 
   // convert it to degrees
-  measuredCold = (measuredColdInt/16.0f);
+  measuredCold = (measuredColdInt / 16.0f);
   // now the tricky part... since MAX31855K is considering a linear response 
   // and is trimemd for K thermocouples, we have to convert the reading back
   // to mV and then use NIST polynomial approximation to determine temperature
@@ -208,11 +208,11 @@ float MAX31855Class::readTemperature(int type)
   // this way we calculate the voltage we would have measured if cold junction 
   // was at 0 degrees celsius
 
-  measuredVolt = coldTempTomv(type, measuredCold - _coldOffset)+(measuredTemp - measuredCold) * 0.041276f;
+  measuredVolt = coldTempTomv(PROBE_K, measuredCold - _coldOffset) + (measuredTemp - measuredCold) * 0.041276f;
 
   // finally from the cold junction compensated voltage we calculate the temperature
   // using NIST polynomial approximation for the thermocouple type we are using
-  return mvtoTemp(type,measuredVolt);
+  return mvtoTemp(type, measuredVolt);
 }
 
 float MAX31855Class::readReferenceTemperature(int type)
@@ -237,6 +237,11 @@ float MAX31855Class::readReferenceTemperature(int type)
   }
   Serial.println(ref);
   return ref;
+}
+
+float MAX31855Class::getColdOffset()
+{
+  return _coldOffset;
 }
 
 void MAX31855Class::setColdOffset(float offset)

@@ -36,6 +36,7 @@ public:
 
   float readTemperature(int type = PROBE_K);
   float readReferenceTemperature(int type = PROBE_K);
+  float getColdOffset();
   void setColdOffset(float offset);
 
 private:
