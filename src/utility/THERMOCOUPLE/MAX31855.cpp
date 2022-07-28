@@ -19,18 +19,18 @@
 
 #include "MAX31855.h"
 
-const double MAX31855Class::Jm210_760[] ;
-const double MAX31855Class::J760_1200[] ;
-const double MAX31855Class::Km270_0[]   ;
-const double MAX31855Class::K0_1372[]   ;
+const double MAX31855Class::Jm210_760[];
+const double MAX31855Class::J760_1200[];
+const double MAX31855Class::Km270_0[];
+const double MAX31855Class::K0_1372[];
 
-const double MAX31855Class::InvJ_neg[]     ;
-const double MAX31855Class::InvJ0_760[]    ;
-const double MAX31855Class::InvJ760_1200[] ;
+const double MAX31855Class::InvJ_neg[];
+const double MAX31855Class::InvJ0_760[];
+const double MAX31855Class::InvJ760_1200[];
 
-const double MAX31855Class::InvK_neg[]     ;
-const double MAX31855Class::InvK0_500[]    ;
-const double MAX31855Class::InvK500_1372[] ;
+const double MAX31855Class::InvK_neg[];
+const double MAX31855Class::InvK0_500[];
+const double MAX31855Class::InvK500_1372[];
 
 const MAX31855Class::coefftable MAX31855Class::CoeffJ[];
 const MAX31855Class::coefftable MAX31855Class::CoeffK[];
@@ -38,21 +38,17 @@ const MAX31855Class::coefftable MAX31855Class::CoeffK[];
 const MAX31855Class::coefftable MAX31855Class::InvCoeffJ[];
 const MAX31855Class::coefftable MAX31855Class::InvCoeffK[];
 
-MAX31855Class::MAX31855Class(int cs, SPIClass& spi) :
-  _cs(cs),
-  _spi(&spi),
-  _spiSettings(4000000, MSBFIRST, SPI_MODE0),
-  _coldOffset(2.10f)
-{
+MAX31855Class::MAX31855Class(PinName cs) : _spi(SPI), _cs(cs), _coldOffset(2.10f) {
 }
 
-int MAX31855Class::begin()
-{
+static SPISettings _spiSettings(1000000, MSBFIRST, SPI_MODE0);
+
+int MAX31855Class::begin() {
   uint32_t rawword;
 
   pinMode(_cs, OUTPUT);
   digitalWrite(_cs, HIGH);
-  _spi->begin();
+  _spi.begin();
 
   rawword = readSensor();
   if (rawword == 0xFFFFFF) {
@@ -64,49 +60,46 @@ int MAX31855Class::begin()
   return 1;
 }
 
-void MAX31855Class::end()
-{
+void MAX31855Class::end() {
   pinMode(_cs, INPUT);
   digitalWrite(_cs, LOW);
-  _spi->end();
+  _spi.end();
 }
 
-uint32_t MAX31855Class::readSensor()
-{
+uint32_t MAX31855Class::readSensor() {
   uint32_t read = 0x00;
 
   digitalWrite(_cs, LOW);
   delayMicroseconds(1);
 
-  _spi->beginTransaction(_spiSettings);
+  _spi.beginTransaction(_spiSettings);
 
 
   for (int i = 0; i < 4; i++) {
     read <<= 8;
-    read |= _spi->transfer(0);
+    read |= _spi.transfer(0);
   }
 
-  _spi->endTransaction();
+  _spi.endTransaction();
 
   digitalWrite(_cs, HIGH);
   return read;
 }
 
-double MAX31855Class::polynomial(double value, int tableEntries,  coefftable const (*table) )
-{
+double MAX31855Class::polynomial(double value, int tableEntries, coefftable const (*table)) {
   double output = 0;
   double valuePower = 1;
-  for (int i=0;i<tableEntries;i++) {
+  for (int i=0; i < tableEntries; i++) {
     if (value < table[i].max) {
-      if (table[i].size ==0) {
+      if (table[i].size == 0) {
         return NAN;
       } 
       else 
       {
         output = 0;
-        for (int j = 0; j<table[i].size;j++) {
-          output += valuePower*table[i].coeffs[j];
-          valuePower *=value;
+        for (int j = 0; j < table[i].size; j++) {
+          output += valuePower * table[i].coeffs[j];
+          valuePower *= value;
         }
         return output;
       }
@@ -123,18 +116,18 @@ double MAX31855Class::coldTempTomv(int type, double temp) {
   switch (type) {
     case PROBE_J:
       table =  CoeffJ;
-      tableEntries = sizeof(CoeffJ)/sizeof(coefftable);
+      tableEntries = sizeof(CoeffJ) / sizeof(coefftable);
     break;
     case PROBE_K:
       table = CoeffK;
-      tableEntries = sizeof(CoeffJ)/sizeof(coefftable);
+      tableEntries = sizeof(CoeffJ) / sizeof(coefftable);
     break;
   }
   voltage = polynomial(temp, tableEntries, table);
   // special case... for K probes in temperature range 0-1372 we need
   // to add an extra term
   if (type==PROBE_K && temp>0) {
-    voltage += 0.118597600000E+00 * exp( -0.118343200000E-03 * pow(temp-0.126968600000E+03, 2));
+    voltage += 0.118597600000E+00 * exp( -0.118343200000E-03 * pow(temp - 0.126968600000E+03, 2));
   }
   return voltage;
 }
@@ -146,18 +139,17 @@ double MAX31855Class::mvtoTemp(int type, double voltage) {
   switch (type) {
     case PROBE_J:
       table =  InvCoeffJ;
-      tableEntries = sizeof(InvCoeffJ)/sizeof(coefftable);
+      tableEntries = sizeof(InvCoeffJ) / sizeof(coefftable);
     break;
     case PROBE_K:
       table = InvCoeffK;
-      tableEntries = sizeof(InvCoeffJ)/sizeof(coefftable);
+      tableEntries = sizeof(InvCoeffJ) / sizeof(coefftable);
     break;
   }
   return polynomial(voltage, tableEntries, table);
 }
 
-float MAX31855Class::readVoltage()
-{
+float MAX31855Class::readVoltage() {
   uint32_t rawword;
   int32_t measuredTempInt;
   int32_t measuredColdInt;
@@ -213,8 +205,7 @@ float MAX31855Class::readVoltage()
   return measuredVolt;
 }
 
-float MAX31855Class::readTemperature(int type)
-{
+float MAX31855Class::readTemperature(int type) {
   double measuredVolt = readVoltage();
 
   // finally from the cold junction compensated voltage we calculate the temperature
@@ -222,8 +213,7 @@ float MAX31855Class::readTemperature(int type)
   return mvtoTemp(type, measuredVolt);
 }
 
-float MAX31855Class::readReferenceTemperature(int type)
-{
+float MAX31855Class::readReferenceTemperature(int type) {
   uint32_t rawword;
   float ref;
 
@@ -246,14 +236,12 @@ float MAX31855Class::readReferenceTemperature(int type)
   return ref;
 }
 
-float MAX31855Class::getColdOffset()
-{
-  return _coldOffset;
+void MAX31855Class::setColdOffset(float offset) {
+  _coldOffset = offset;
 }
 
-void MAX31855Class::setColdOffset(float offset)
-{
-  _coldOffset = offset;
+float MAX31855Class::getColdOffset() {
+  return _coldOffset;
 }
 
 MAX31855Class THERM;

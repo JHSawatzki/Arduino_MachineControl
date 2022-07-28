@@ -29,7 +29,7 @@
 
 class MAX31855Class {
 public:
-  MAX31855Class(int cs = 7, SPIClass& spi = SPI);
+  MAX31855Class(PinName cs = PI_0);
 
   int begin();
   void end();
@@ -37,15 +37,14 @@ public:
   float readVoltage();
   float readTemperature(int type = PROBE_K);
   float readReferenceTemperature(int type = PROBE_K);
-  float getColdOffset();
   void setColdOffset(float offset);
+  float getColdOffset();
 
 private:
   uint32_t readSensor();
   float    _coldOffset;
-  int _cs;
-  SPIClass* _spi;
-  SPISettings _spiSettings;
+  PinName _cs;
+  SPIClass& _spi;
 
   // NIST coefficient tables
   static constexpr double Jm210_760[]    = { 0.000000000000E+00, 0.503811878150E-01, 0.304758369300E-04,-0.856810657200E-07, 0.132281952950E-09,-0.170529583370E-12, 0.209480906970E-15,-0.125383953360E-18, 0.156317256970E-22 };
