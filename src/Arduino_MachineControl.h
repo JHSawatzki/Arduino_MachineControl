@@ -404,7 +404,7 @@ public:
 	 * Test connection with the IOExpander and set all the pins to the default mode. 
 	 * @return true if OK, false if fault
 	 */
-	bool  init() {
+	bool init() {
 		return begin(IO_ADD);
 	}
 
