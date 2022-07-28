@@ -16,10 +16,10 @@
 namespace machinecontrol {
 
 /**
- * The RTDClass allows enabling and selecting the different temperature sensor inputs
+ * The TemperatureProbesClass allows enabling and selecting the different temperature sensor inputs
  * (RTD and thermocouples)
  */
-class RTDClass {
+class TemperatureProbesClass {
 public:
 
 	/**
@@ -72,7 +72,7 @@ private:
 
 };
 
-extern RTDClass temp_probes;
+extern TemperatureProbesClass temp_probes;
 
 /**
  * The COMMClass is used to initialize the CAN and RS485 LEDs and 
@@ -489,7 +489,7 @@ private:
 
 extern DigitalOutputsClass digital_outputs;
 
-class ProgrammableDINClass : public ArduinoIOExpanderClass {
+class DigitalInputsClass : public ArduinoIOExpanderClass {
 public:
 	/**
 	 * Test connection with the IOExpander and set all the pins to the default mode. 
@@ -500,7 +500,7 @@ public:
 	}
 };
 
-extern ProgrammableDINClass digital_inputs;
+extern DigitalInputsClass digital_inputs;
 
 /**
  * The RtcControllerClass is a wrapper for the PCF8563TClass() that is used to 
