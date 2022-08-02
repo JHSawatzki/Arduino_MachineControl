@@ -34,7 +34,6 @@ bool MAX31865Class::begin(int wires) {
   if (wires == THREE_WIRE) {
     writeByte(MAX31856_CONFIG_REG, (readByte(MAX31856_CONFIG_REG) | MAX31856_CONFIG_3_WIRE));
   } else {
-  
     writeByte(MAX31856_CONFIG_REG, (readByte(MAX31856_CONFIG_REG) & MAX31856_CONFIG_WIRE_MASK));
   }
 
@@ -146,17 +145,16 @@ float MAX31865Class::readTemperature(float RTDnominal, float refResistor) {
 }
 
 uint32_t MAX31865Class::readRTD() {
-
   // clear fault
   writeByte(MAX31856_CONFIG_REG, (readByte(MAX31856_CONFIG_REG) & MAX31856_CONFIG_CLEAR_FAULT_CYCLE) | MAX31856_CONFIG_CLEAR_FAULT);
 
   // enable bias
   writeByte(MAX31856_CONFIG_REG, (readByte(MAX31856_CONFIG_REG) | MAX31856_CONFIG_BIAS_ON));
-  delay(10);
+  delay(10); // TODO possibly tune delay?
 
   // ONE shot cOnfIg and make readings change with readByte
   writeByte(MAX31856_CONFIG_REG, readByte(MAX31856_CONFIG_REG) | MAX31856_CONFIG_ONE_SHOT);
-  delay(65);
+  delay(65); // TODO possibly tune delay?
 
   //readings bytes
   uint16_t read = (readBytes(MAX31856_RTD_MSB_REG));

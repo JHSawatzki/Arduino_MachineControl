@@ -74,7 +74,6 @@ uint32_t MAX31855Class::readSensor() {
 
   _spi.beginTransaction(_spiSettings);
 
-
   for (int i = 0; i < 4; i++) {
     read <<= 8;
     read |= _spi.transfer(0);
@@ -89,7 +88,7 @@ uint32_t MAX31855Class::readSensor() {
 double MAX31855Class::polynomial(double value, int tableEntries, coefftable const (*table)) {
   double output = 0;
   double valuePower = 1;
-  for (int i=0; i < tableEntries; i++) {
+  for (int i = 0; i < tableEntries; i++) {
     if (value < table[i].max) {
       if (table[i].size == 0) {
         return NAN;
@@ -126,7 +125,7 @@ double MAX31855Class::coldTempTomv(int type, double temp) {
   voltage = polynomial(temp, tableEntries, table);
   // special case... for K probes in temperature range 0-1372 we need
   // to add an extra term
-  if (type==PROBE_K && temp>0) {
+  if (type == PROBE_K && temp > 0) {
     voltage += 0.118597600000E+00 * exp( -0.118343200000E-03 * pow(temp - 0.126968600000E+03, 2));
   }
   return voltage;

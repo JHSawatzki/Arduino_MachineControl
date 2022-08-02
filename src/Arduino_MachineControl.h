@@ -52,7 +52,6 @@ public:
 		rtd_th = 1;
 		digitalWrite(PI_0, HIGH);
 		digitalWrite(PA_6, LOW);
-
 	}
 
 	/**
