@@ -1,7 +1,7 @@
 #ifndef __MACHINE_CONTROL_H__
 #define __MACHINE_CONTROL_H__
 
-#include "utility/MAX31865/MAX31865.h"
+#include "utility/RTD/MAX31865.h"
 #include "utility/THERMOCOUPLE/MAX31855.h"
 #include <ArduinoRS485.h>
 #include "utility/QEI/QEI.h"
