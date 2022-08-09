@@ -24,7 +24,6 @@
 #include <mbed.h>
 #include <SPI.h>
 
-
 #define MAX31856_CONFIG_REG 0x00
 #define MAX31856_RTD_MSB_REG 0x01
 #define MAX31856_FAULT_STATUS_REG 0x07
@@ -70,7 +69,6 @@
 #define TWO_WIRE 0
 #define THREE_WIRE 1
 
-
 class MAX31865Class {
 public:
   MAX31865Class(PinName cs = PA_6);
@@ -89,8 +87,6 @@ public:
   bool getLowRTDINFault(uint8_t fault);
   bool getVoltageFault(uint8_t fault);
 
-
-
 private:
   uint8_t readByte(uint8_t addr);
   uint16_t readBytes(uint8_t addr);
@@ -99,6 +95,5 @@ private:
   PinName _cs;
   SPIClass& _spi;
 };
-
 
 #endif
