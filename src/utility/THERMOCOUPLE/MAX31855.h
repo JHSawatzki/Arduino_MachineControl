@@ -43,7 +43,7 @@ public:
 private:
   uint32_t readSensor();
   float    _coldOffset;
-  PinName _cs;
+  int _cs;
   SPIClass& _spi;
 
   // NIST coefficient tables
