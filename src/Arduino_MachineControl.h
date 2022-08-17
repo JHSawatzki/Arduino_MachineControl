@@ -86,11 +86,11 @@ public:
 	 */
 	void init() {
 		//SHUTDOWN OF RS485 LEDS
-		digitalWrite(PinNameToIndex(PA_0), LOW);
-		digitalWrite(PinNameToIndex(PI_9), LOW);
+		digitalWrite(PA_0, LOW);
+		digitalWrite(PI_9, LOW);
 		//SHUTDOWN OF CAN LEDS
-		digitalWrite(PinNameToIndex(PB_8), HIGH);
-		digitalWrite(PinNameToIndex(PH_13), HIGH);
+		digitalWrite(PB_8, HIGH);
+		digitalWrite(PH_13, HIGH);
 
 		// SET DEFAULTS for RS485
 		rs485Enable(false);
@@ -123,15 +123,15 @@ public:
 	arduino::UART _UART4_ {PA_0, PI_9, NC, NC};
 	mbed::CAN can {PB_8, PH_13};
 
-	RS485Class rs485 {_UART4_, PinNameToIndex(PA_0), PinNameToIndex(PI_13), PinNameToIndex(PI_10)};
+	RS485Class rs485 {_UART4_, PA_0, PI_13, PI_10};
 
-	void rs485Enable(bool enable) 		{ digitalWrite(PinNameToIndex(PG_9),  enable ? 	HIGH : LOW); }
-	void rs485ModeRS232(bool enable) 	{ digitalWrite(PinNameToIndex(PA_10), enable ? 	LOW : HIGH); }
-	void rs485YZTerm(bool enable) 		{ digitalWrite(PinNameToIndex(PI_15), enable ? 	HIGH : LOW); }
-	void rs485ABTerm(bool enable) 		{ digitalWrite(PinNameToIndex(PI_14), enable ? 	HIGH : LOW); }
-    void rs485Slew(bool enable)  		{ digitalWrite(PinNameToIndex(PG_14), enable ? 	LOW : HIGH); }
+	void rs485Enable(bool enable) 		{ digitalWrite(PG_9,  enable ? 	HIGH : LOW); }
+	void rs485ModeRS232(bool enable) 	{ digitalWrite(PA_10, enable ? 	LOW : HIGH); }
+	void rs485YZTerm(bool enable) 		{ digitalWrite(PI_15, enable ? 	HIGH : LOW); }
+	void rs485ABTerm(bool enable) 		{ digitalWrite(PI_14, enable ? 	HIGH : LOW); }
+    void rs485Slew(bool enable)  		{ digitalWrite(PG_14, enable ? 	LOW : HIGH); }
 	void rs485FullDuplex(bool enable) 	{
-		digitalWrite(PinNameToIndex(PA_9), enable ? LOW : HIGH);
+		digitalWrite(PA_9, enable ? LOW : HIGH);
 		if (enable) {
 			// RS485 Full Duplex require YZ and AB 120 Ohm termination enabled
 			rs485YZTerm(true);
