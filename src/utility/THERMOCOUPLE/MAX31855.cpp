@@ -242,5 +242,3 @@ void MAX31855Class::setColdOffset(float offset) {
 float MAX31855Class::getColdOffset() {
   return _coldOffset;
 }
-
-MAX31855Class THERM;

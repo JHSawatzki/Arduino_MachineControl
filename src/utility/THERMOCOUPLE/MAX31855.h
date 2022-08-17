@@ -42,7 +42,7 @@ public:
 
 private:
   uint32_t readSensor();
-  float    _coldOffset;
+  float _coldOffset;
   int _cs;
   SPIClass& _spi;
 
@@ -98,7 +98,5 @@ private:
   double polynomial(double value, int tableEntries,  coefftable const (*table) );
 
 };
-
-extern MAX31855Class THERM;
 
 #endif
