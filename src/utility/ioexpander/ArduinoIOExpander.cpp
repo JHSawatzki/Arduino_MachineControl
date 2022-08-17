@@ -16,9 +16,8 @@
 
 #include "ArduinoIOExpander.h"
 
-bool ArduinoIOExpanderClass::begin()
-{
-  if(!_tca.testConnection()) {
+bool ArduinoIOExpanderClass::begin() {
+  if (!_tca.testConnection()) {
     return false;
   }
   //Initialize all pins to the default mode
@@ -27,10 +26,9 @@ bool ArduinoIOExpanderClass::begin()
   return true;
 }
 
-bool ArduinoIOExpanderClass::begin(uint8_t address)
-{
+bool ArduinoIOExpanderClass::begin(uint8_t address) {
   setAddress(address);
-  if(!_tca.testConnection()) {
+  if (!_tca.testConnection()) {
     return false;
   }
   //Initialize all pins to the default mode
@@ -39,13 +37,11 @@ bool ArduinoIOExpanderClass::begin(uint8_t address)
   return true;
 }
 
-ArduinoIOExpanderClass::operator bool()
-{
+ArduinoIOExpanderClass::operator bool() {
   return _tca.testConnection();
 }
 
-bool ArduinoIOExpanderClass::pinMode(int pin, PinMode direction)
-{
+bool ArduinoIOExpanderClass::pinMode(int pin, PinMode direction) {
   if (direction > OUTPUT)
     return false;
 
@@ -57,8 +53,7 @@ void ArduinoIOExpanderClass::setAddress(uint8_t address) {
   _tca.setAddress(address);
 }
 
-bool ArduinoIOExpanderClass::set(int pin, PinStatus status)
-{ 
+bool ArduinoIOExpanderClass::set(int pin, PinStatus status) { 
   if (pin < IO_READ_CH_PIN_00) {
     if (status > HIGH)
         return false;
@@ -69,14 +64,13 @@ bool ArduinoIOExpanderClass::set(int pin, PinStatus status)
   return false; 
 }
 
-int ArduinoIOExpanderClass::read(int pin)
-{
-  if(_tca.getAddress() == IO_ADD) {
+int ArduinoIOExpanderClass::read(int pin) {
+  if (_tca.getAddress() == IO_ADD) {
     if (pin > TCA6424A_P13 && pin <= TCA6424A_P27) {
       return _tca.readPin(pin) == true ? 1 : 0;
     }
-  } else if(_tca.getAddress() == DIN_ADD) {
-    if ((pin >=   TCA6424A_P00)  && (pin <=   TCA6424A_P10) && (pin !=TCA6424A_P03)) {
+  } else if (_tca.getAddress() == DIN_ADD) {
+    if ((pin >= TCA6424A_P00) && (pin <= TCA6424A_P10) && (pin != TCA6424A_P03)) {
         return _tca.readPin(pin) == true ? 1 : 0;
     }
   }
@@ -84,24 +78,21 @@ int ArduinoIOExpanderClass::read(int pin)
 }
 
 void ArduinoIOExpanderClass::writeAll(uint32_t banks) {
-  _tca.writeAll(banks & 0xFF, (banks  >> 8) & 0xFF, 0x00);
+  _tca.writeAll(banks & 0xFF, (banks >> 8) & 0xFF, 0x00);
 }
 
-uint32_t ArduinoIOExpanderClass::readAll()
-{
+uint32_t ArduinoIOExpanderClass::readAll() {
   uint8_t banks[3];
   _tca.readAll(banks);
   return *(uint32_t*)banks;
 }
 
 
-void ArduinoIOExpanderClass::toggle(){
+void ArduinoIOExpanderClass::toggle() {
   writeAll(~(readAll()));
 }
 
-void ArduinoIOExpanderClass::initPins()
-{
-
+void ArduinoIOExpanderClass::initPins() {
     if (_tca.getAddress() == IO_ADD) {
       set(IO_WRITE_CH_PIN_00, SWITCH_OFF);
       set(IO_WRITE_CH_PIN_01, SWITCH_OFF);
