@@ -35,23 +35,17 @@ public:
 	}
 
 	/**
-	*  Enable the CS of the Thermocouple to digital converter
-	*  Disable the CS for the RTD to digital converter
+	*  Disable the bias / force line
 	*/   
 	void enableTC() {
-		rtd_th = 0;
-		digitalWrite(PI_0, LOW);
-		digitalWrite(PA_6, HIGH);
+		_rtd_th = 0;
 	}
 
 	/**
-	*  Enable the CS of the RDT to digital converter. 
-	*  Disable the CS of the Thermocouple to digital converter
+	*  Enable the bias / force line
 	*/   
 	void enableRTD() {
-		rtd_th = 1;
-		digitalWrite(PI_0, HIGH);
-		digitalWrite(PA_6, LOW);
+		_rtd_th = 1;
 	}
 
 	/**
