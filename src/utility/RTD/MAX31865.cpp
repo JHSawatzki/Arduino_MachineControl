@@ -56,11 +56,11 @@ bool MAX31865Class::begin(max31865_numwires_t wires) {
     digitalWrite(_cs, HIGH);
 
     setWires(wires);
-    enableBias(false);
-    autoConvert(false);
+    setBias(false);
+    setAutoConvert(false);
     setThresholds(0, 0xFFFF);
     clearFault();
-    setState(IDLE); // added for asynchronous
+    _async_state = IDLE; // added for asynchronous
 
     _begun = true;
     _paused = false;
@@ -69,21 +69,21 @@ bool MAX31865Class::begin(max31865_numwires_t wires) {
   return true;
 }
 
-void resume(void) {
+void MAX31865Class::resume(void) {
   if (_begun && _paused) {
     _spi.begin();
     _paused = false;
   }
 }
 
-void pause(void) {
+void MAX31865Class::pause(void) {
   if (_begun && !_paused) {
     _spi.end();
     _paused = true;
   }
 }
 
-void end(void) {
+void MAX31865Class::end(void) {
   if(_begun) {
     pause();
 
@@ -154,7 +154,7 @@ void MAX31865Class::setWires(max31865_numwires_t wires) {
     @param enabled If true, continuous conversion is enabled
 */
 /**************************************************************************/
-void MAX31865Class::autoConvert(bool enabled) {
+void MAX31865Class::setAutoConvert(bool enabled) {
   uint8_t config = readByte(MAX31865_CONFIG_REG);
   if (enabled) {
     config |= MAX31865_CONFIG_MODEAUTO; // enable continuous conversion
@@ -162,7 +162,7 @@ void MAX31865Class::autoConvert(bool enabled) {
     config &= ~MAX31865_CONFIG_MODEAUTO; // disable continuous conversion
   }
   writeByte(MAX31865_CONFIG_REG, config);
-  if (enbaled && !_continuous_mode_enabled) {
+  if (enabled && !_continuous_mode_enabled) {
     if (_50hz_filter_enabled) {
       delay(70);
     } else {
@@ -178,7 +178,7 @@ void MAX31865Class::autoConvert(bool enabled) {
     @param enabled If true, 50Hz noise is filtered, else 60Hz(default)
 */
 /**************************************************************************/
-void MAX31865Class::enable50Hz(bool enabled) {
+void MAX31865Class::set50HzFilter(bool enabled) {
   uint8_t config = readByte(MAX31865_CONFIG_REG);
   if (enabled) {
     config |= MAX31865_CONFIG_FILT50HZ;
@@ -195,7 +195,7 @@ void MAX31865Class::enable50Hz(bool enabled) {
     @param enabled If true bias is enabled, else disabled
 */
 /**************************************************************************/
-void MAX31865Class::enableBias(bool enabled) {
+void MAX31865Class::setBias(bool enabled) {
   uint8_t config = readByte(MAX31865_CONFIG_REG);
   if (enabled) {
     config |= MAX31865_CONFIG_BIAS; // enable bias
@@ -235,6 +235,7 @@ uint8_t MAX31865Class::readFault(max31865_fault_cycle_t fault_cycle) {
         break;
     }
   }
+  return readByte(MAX31865_FAULTSTAT_REG);
 }
 
 /**************************************************************************/
@@ -321,8 +322,8 @@ bool MAX31865Class::readRTDAsync(uint16_t& rtd_value_raw) {
       break;
 
     case CONVERTING: // Conversion started, waiting for completion
-      if (millis() - _async_timer >= _50hz_filter_enabled ! 75 : 65) {
-        rtd = readWord(MAX31865_RTDMSB_REG);
+      if (millis() - _async_timer >= (_50hz_filter_enabled ? 75 : 65)) {
+        rtd_value_raw = readWord(MAX31865_RTDMSB_REG);
         rtd_value_raw >>= 1; // remove fault
         _async_state = IDLE; // get ready for next time
         value_available = true; // signal computation is done
@@ -368,11 +369,11 @@ float MAX31865Class::calculateTemperature(uint16_t rtd_value_raw, float rtd_nomi
 
   Rt = rtd_value_raw;
   Rt /= 32768;
-  Rt *= refResistor;
+  Rt *= ref_res_value;
 
   Z1 = -RTD_A;
   Z2 = RTD_A * RTD_A - (4 * RTD_B);
-  Z3 = (4 * RTD_B) / RTDnominal;
+  Z3 = (4 * RTD_B) / rtd_nominal_value;
   Z4 = 2 * RTD_B;
 
   temp = Z2 + (Z3 * Rt);
@@ -383,7 +384,7 @@ float MAX31865Class::calculateTemperature(uint16_t rtd_value_raw, float rtd_nomi
   }
 
   // ugh.
-  Rt /= RTDnominal;
+  Rt /= rtd_nominal_value;
   Rt *= 100; // normalize to 100 ohm
 
   float rpoly = Rt;

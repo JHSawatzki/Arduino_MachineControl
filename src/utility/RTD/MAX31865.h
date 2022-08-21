@@ -74,7 +74,7 @@ typedef enum max31865_numwires {
   MAX31865_4WIRE = 0
 } max31865_numwires_t;
 
-enum t_state : byte {IDLE, SETTLING, CONVERTING}; // for asynchronous mode
+enum conversion_state_t : byte {IDLE, SETTLING, CONVERTING}; // for asynchronous mode
 
 typedef enum {
   MAX31865_FAULT_NONE = 0,
@@ -125,7 +125,7 @@ private:
   bool _50hz_filter_enabled; // 50Hz filter
   bool _bias_voltage_enabled; // bias voltage
   uint32_t _async_timer; // timer for asynchronous mode, added Sylvain Boyer
-  t_state _async_state; // state for asynchronous mode //Does static matter?
+  conversion_state_t _async_state; // state for asynchronous mode //Does static matter?
 };
 
 #endif
