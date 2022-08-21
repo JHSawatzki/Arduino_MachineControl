@@ -21,17 +21,53 @@ namespace machinecontrol {
  */
 class TemperatureProbesClass {
 public:
-
 	/**
 	*  Select the input channel to be read (3 channels available)
 	*  
 	*  @param channel (0-2)
 	*/   
 	void selectChannel(int channel) {
-		for (int i=0; i<3; i++) {
-			ch_sel[i] = (i == channel ? 1 : 0);
+		if (_current_channel != channel) {
+			for (int i = 0; i < 3; i++) {
+				_ch_sel[i] = (i == channel ? 1 : 0);
+			}
+			delay(75);
+			_current_channel = channel;
 		}
-		delayMicroseconds(150); //TODO possibly tune to 100 microseconds or below
+	}
+
+	/**
+	*  Select the input channel to be read (3 channels available)
+	*  
+	*  @param channel (0-2)
+	*/   
+	bool selectChannelAsync(int channel) {
+		bool channel_selected = false;
+
+		if (channel >= 0 && channel <= 2) {
+			if (_current_channel != channel) {
+				for (int i = 0; i < 3; i++) {
+					_ch_sel[i] = (i == channel ? 1 : 0);
+				}
+				_current_channel = channel;
+				_async_timer = millis();
+				_async_state = SWITCHING;
+			} else {
+				switch (_async_state) {
+					case SWITCHING: // Channel switching
+						if (millis() - _async_timer >= 75) {
+							_async_state = SELECTED;
+							channel_selected = true;
+						}
+						break;
+					case SELECTED: // Channel selected
+						channel_selected = true;
+						break;
+				}
+			}
+		}
+		
+		return channel_selected;
 	}
 
 	/**
@@ -56,13 +92,18 @@ public:
 		digitalWrite(PI_0, HIGH);
 		digitalWrite(PA_6, HIGH);
 	}
+
+	enum channel_select_state_t : byte {SWITCHING, SELECTED}; // for asynchronous mode
+
 	MAX31865Class rtd = MAX31865Class(PA_6);
 	MAX31855Class tc = MAX31855Class(PI_0);
 
 private:
-	mbed::DigitalOut ch_sel[3] = { mbed::DigitalOut(PD_6), mbed::DigitalOut(PI_4), mbed::DigitalOut(PG_10)};
-	mbed::DigitalOut rtd_th = mbed::DigitalOut(PC_15);
-
+	mbed::DigitalOut _ch_sel[3] = { mbed::DigitalOut(PD_6), mbed::DigitalOut(PI_4), mbed::DigitalOut(PG_10)};
+	mbed::DigitalOut _rtd_th = mbed::DigitalOut(PC_15);
+	int _current_channel = -1;
+	uint32_t _async_timer; // timer for asynchronous mode
+	channel_select_state_t _async_state = SELECTED; // state for asynchronous mode
 };
 
 extern TemperatureProbesClass temp_probes;
