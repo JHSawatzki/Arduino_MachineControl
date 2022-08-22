@@ -41,7 +41,7 @@ const MAX31855Class::coefftable MAX31855Class::InvCoeffK[];
 MAX31855Class::MAX31855Class(PinName cs) : _spi(SPI), _cs(cs), _coldOffset(2.10f) {
 }
 
-static SPISettings _spiSettings(1000000, MSBFIRST, SPI_MODE0);
+static SPISettings _spiSettings(4000000, MSBFIRST, SPI_MODE0);
 
 int MAX31855Class::begin() {
   uint32_t rawword;
