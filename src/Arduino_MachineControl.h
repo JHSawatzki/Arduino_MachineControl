@@ -89,14 +89,14 @@ public:
 	*  
 	*/   
 	void disableCS() {
-		digitalWrite(PI_0, HIGH);
+		digitalWrite(PA_7, HIGH);
 		digitalWrite(PA_6, HIGH);
 	}
 
 	enum channel_select_state_t : byte {SWITCHING, SELECTED}; // for asynchronous mode
 
 	MAX31865Class rtd = MAX31865Class(PA_6);
-	MAX31855Class tc = MAX31855Class(PI_0);
+	MAX31855Class tc = MAX31855Class(PA_7);
 
 private:
 	mbed::DigitalOut _ch_sel[3] = { mbed::DigitalOut(PD_6), mbed::DigitalOut(PI_4), mbed::DigitalOut(PG_10)};
