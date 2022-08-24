@@ -94,7 +94,7 @@ private:
   };
 
   double mvtoTemp(int type, double voltage);
-  double coldTempTomv(int type, double temp);
+  double tempTomv(int type, double temp);
   double polynomial(double value, int tableEntries,  coefftable const (*table) );
 
 };

@@ -113,7 +113,7 @@ double MAX31855Class::polynomial(double value, int tableEntries, coefftable cons
   return NAN;
 }
 
-double MAX31855Class::coldTempTomv(int type, double temp) {
+double MAX31855Class::tempTomv(int type, double temp) {
   coefftable const (*table);
   int tableEntries;
   double voltage;
