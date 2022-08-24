@@ -154,7 +154,7 @@ double MAX31855Class::mvtoTemp(int type, double voltage) {
   return polynomial(voltage, tableEntries, table);
 }
 
-float MAX31855Class::readVoltage() {
+float MAX31855Class::readVoltage(int type) {
   uint32_t rawword;
   int32_t measuredTempInt;
   int32_t measuredColdInt;
@@ -219,13 +219,13 @@ float MAX31855Class::readVoltage() {
   // calculated inverting the function above
   // this way we calculate the voltage we would have measured if cold junction 
   // was at 0 degrees celsius
-  measuredVolt = coldTempTomv(PROBE_K, measuredCold - _coldOffset) + (measuredTemp - measuredCold) * 0.041276f;
+  measuredVolt = tempTomv(type, measuredCold - _coldOffset) + (measuredTemp - measuredCold) * 0.041276f;
 
   return measuredVolt;
 }
 
 float MAX31855Class::readTemperature(int type) {
-  double measuredVolt = readVoltage();
+  double measuredVolt = readVoltage(type);
 
   // finally from the cold junction compensated voltage we calculate the temperature
   // using NIST polynomial approximation for the thermocouple type we are using

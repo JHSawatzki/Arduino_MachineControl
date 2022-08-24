@@ -34,7 +34,7 @@ public:
   int begin();
   void end();
 
-  float readVoltage();
+  float readVoltage(int type = PROBE_K);
   float readTemperature(int type = PROBE_K);
   float readReferenceTemperature(int type = PROBE_K);
   void setColdOffset(float offset);
