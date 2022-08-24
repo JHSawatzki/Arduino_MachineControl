@@ -26,12 +26,12 @@ public:
 	*  
 	*  @param channel (0-2)
 	*/   
-	void selectChannel(int channel) {
+	void selectChannel(int channel, uint8_t switch_delay) {
 		if (_current_channel != channel) {
 			for (int i = 0; i < 3; i++) {
 				_ch_sel[i] = (i == channel ? 1 : 0);
 			}
-			delay(75);
+			delay(switch_delay);
 			_current_channel = channel;
 		}
 	}
@@ -41,7 +41,7 @@ public:
 	*  
 	*  @param channel (0-2)
 	*/   
-	bool selectChannelAsync(int channel) {
+	bool selectChannelAsync(int channel, uint8_t switch_delay) {
 		bool channel_selected = false;
 
 		if (channel >= 0 && channel <= 2) {
@@ -55,7 +55,7 @@ public:
 			} else {
 				switch (_async_state) {
 					case SWITCHING: // Channel switching
-						if (millis() - _async_timer >= 75) {
+						if (millis() - _async_timer >= switch_delay) {
 							_async_state = SELECTED;
 							channel_selected = true;
 						}
