@@ -56,7 +56,7 @@ int MAX31855Class::begin() {
   rawword = readSensor();
   if (rawword == 0xFFFFFF) {
 		//comm_protocols.rs485.beginTransmission();
-		//comm_protocols.rs485.println(message_token);
+		//comm_protocols.rs485.println("TC begin error");
 		//comm_protocols.rs485.endTransmission();
     end();
 
