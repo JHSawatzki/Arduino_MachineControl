@@ -15,6 +15,8 @@
 
 namespace machinecontrol {
 
+enum temperature_sensor_t : byte {TC, RTD};
+
 /**
  * The TemperatureProbesClass allows enabling and selecting the different temperature sensor inputs
  * (RTD and thermocouples)
@@ -25,11 +27,25 @@ public:
 	*  Select the input channel to be read (3 channels available)
 	*  
 	*  @param channel (0-2)
-	*/   
-	void selectChannel(int channel, uint8_t switch_delay) {
+	*/
+	void selectChannel(int channel, temperature_sensor_t temperature_sensor) {
 		if (_current_channel != channel) {
 			for (int i = 0; i < 3; i++) {
 				_ch_sel[i] = (i == channel ? 1 : 0);
+			}
+			uint8_t switch_delay;
+			switch (temperature_sensor) {
+				case TC:
+					switch_delay = 150;
+					break;
+				
+				case RTD:
+					switch_delay = 75;
+					break;
+				
+				default:
+					switch_delay = 150;
+					break;
 			}
 			delay(switch_delay);
 			_current_channel = channel;
@@ -40,8 +56,8 @@ public:
 	*  Select the input channel to be read (3 channels available)
 	*  
 	*  @param channel (0-2)
-	*/   
-	bool selectChannelAsync(int channel, uint8_t switch_delay) {
+	*/
+	bool selectChannelAsync(int channel, temperature_sensor_t temperature_sensor) {
 		bool channel_selected = false;
 
 		if (channel >= 0 && channel <= 2) {
@@ -55,6 +71,20 @@ public:
 			} else {
 				switch (_async_state) {
 					case SWITCHING: // Channel switching
+						uint8_t switch_delay;
+						switch (temperature_sensor) {
+							case TC:
+								switch_delay = 150;
+								break;
+							
+							case RTD:
+								switch_delay = 75;
+								break;
+							
+							default:
+								switch_delay = 150;
+								break;
+						}
 						if (millis() - _async_timer >= switch_delay) {
 							_async_state = SELECTED;
 							channel_selected = true;
