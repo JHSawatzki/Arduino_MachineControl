@@ -55,9 +55,9 @@ int MAX31855Class::begin() {
 
   rawword = readSensor();
   if (rawword == 0xFFFFFF) {
-		//comm_protocols.rs485.beginTransmission();
-		//comm_protocols.rs485.println("TC begin error");
-		//comm_protocols.rs485.endTransmission();
+    //comm_protocols.rs485.beginTransmission();
+    //comm_protocols.rs485.println("TC begin error");
+    //comm_protocols.rs485.endTransmission();
     end();
 
     return 0;
@@ -98,9 +98,7 @@ double MAX31855Class::polynomial(double value, int tableEntries, coefftable cons
     if (value < table[i].max) {
       if (table[i].size == 0) {
         return NAN;
-      } 
-      else 
-      {
+      } else {
         output = 0;
         for (int j = 0; j < table[i].size; j++) {
           output += valuePower * table[i].coeffs[j];
@@ -125,7 +123,7 @@ double MAX31855Class::tempTomv(int type, double temp) {
     break;
     case PROBE_K:
       table = CoeffK;
-      tableEntries = sizeof(CoeffJ) / sizeof(coefftable);
+      tableEntries = sizeof(CoeffK) / sizeof(coefftable);
     break;
   }
   voltage = polynomial(temp, tableEntries, table);
@@ -148,13 +146,13 @@ double MAX31855Class::mvtoTemp(int type, double voltage) {
     break;
     case PROBE_K:
       table = InvCoeffK;
-      tableEntries = sizeof(InvCoeffJ) / sizeof(coefftable);
+      tableEntries = sizeof(InvCoeffK) / sizeof(coefftable);
     break;
   }
   return polynomial(voltage, tableEntries, table);
 }
 
-float MAX31855Class::readVoltage(int type) {
+double MAX31855Class::readVoltage(int type) {
   uint32_t rawword;
   int32_t measuredTempInt;
   int32_t measuredColdInt;
@@ -224,7 +222,7 @@ float MAX31855Class::readVoltage(int type) {
   return measuredVolt;
 }
 
-float MAX31855Class::readTemperature(int type) {
+double MAX31855Class::readTemperature(int type) {
   double measuredVolt = readVoltage(type);
 
   // finally from the cold junction compensated voltage we calculate the temperature
@@ -232,9 +230,9 @@ float MAX31855Class::readTemperature(int type) {
   return mvtoTemp(type, measuredVolt);
 }
 
-float MAX31855Class::readReferenceTemperature(int type) {
+double MAX31855Class::readReferenceTemperature(int type) {
   uint32_t rawword;
-  float ref;
+  double reference;
 
   rawword = readSensor();
 
@@ -246,19 +244,19 @@ float MAX31855Class::readReferenceTemperature(int type) {
   rawword = rawword & 0x7FF;
   // check sign bit  and convert to negative value.
   if (rawword & 0x800) {
-    ref = (0xF800 | (rawword & 0x7FF))*0.0625;
+    reference = (0xF800 | (rawword & 0x7FF)) * 0.0625f;
   } else {
-      // multiply for the LSB value
-      ref = rawword * 0.0625f;
+    // multiply for the LSB value
+    reference = rawword * 0.0625f;
   }
-  Serial.println(ref);
-  return ref;
+
+  return reference;
 }
 
-void MAX31855Class::setColdOffset(float offset) {
+void MAX31855Class::setColdOffset(double offset) {
   _coldOffset = offset;
 }
 
-float MAX31855Class::getColdOffset() {
+double MAX31855Class::getColdOffset() {
   return _coldOffset;
 }

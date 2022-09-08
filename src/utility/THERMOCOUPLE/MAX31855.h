@@ -34,15 +34,15 @@ public:
   int begin();
   void end();
 
-  float readVoltage(int type = PROBE_K);
-  float readTemperature(int type = PROBE_K);
-  float readReferenceTemperature(int type = PROBE_K);
-  void setColdOffset(float offset);
-  float getColdOffset();
+  double readVoltage(int type = PROBE_K);
+  double readTemperature(int type = PROBE_K);
+  double readReferenceTemperature(int type = PROBE_K);
+  void setColdOffset(double offset);
+  double getColdOffset();
 
 private:
   uint32_t readSensor();
-  float _coldOffset;
+  double _coldOffset;
   int _cs;
   SPIClass& _spi;
 
@@ -80,14 +80,14 @@ private:
   };
 
   static constexpr coefftable InvCoeffJ []= {
-    {0,-0.895, NULL},
+    {0,-0.895f, NULL},
     {sizeof(InvJ_neg) / sizeof(double), 0.0f, &InvJ_neg[0]},
     {sizeof(InvJ0_760) / sizeof(double), 42.919f, &InvJ0_760[0]},
     {sizeof(InvJ760_1200) / sizeof(double), 69.533f, &InvJ760_1200[0]}
   };
 
   static constexpr coefftable InvCoeffK []= {
-    {0,-5.891, NULL},
+    {0,-5.891f, NULL},
     {sizeof(InvK_neg) / sizeof(double), 0.0f, &InvK_neg[0]},
     {sizeof(InvK0_500) / sizeof(double), 20.644f, &InvK0_500[0]},
     {sizeof(InvK500_1372) / sizeof(double), 54.886f, &InvK500_1372[0]},
