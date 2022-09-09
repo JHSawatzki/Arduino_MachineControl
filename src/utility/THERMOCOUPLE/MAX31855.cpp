@@ -165,8 +165,9 @@ double MAX31855Class::readVoltage(int type) {
   //comm_protocols.rs485.endTransmission();
   rawword = readSensor();
 
+  _lastFault = rawword & _faultMask;
   // Check for reading error
-  if (rawword & 0x7) {
+  if (_lastFault) {
     //comm_protocols.rs485.beginTransmission();
     //comm_protocols.rs485.println("TC reading error");
     //comm_protocols.rs485.endTransmission();
@@ -259,4 +260,24 @@ void MAX31855Class::setColdOffset(double offset) {
 
 double MAX31855Class::getColdOffset() {
   return _coldOffset;
+}
+
+uint8_t MAX31855Class::getLastFault() {
+  uint8_t tempLastFault = _lastFault;
+  _lastFault = 0;
+  return tempLastFault;
+}
+
+/**************************************************************************/
+/*!
+    @brief  Set the faults to check when reading temperature. If any set
+    faults occur, temperature reading will return NAN.
+    @param faults Faults to check. Use logical OR combinations of preset
+    fault masks: TC_FAULT_OPEN, TC_FAULT_SHORT_GND,
+    TC_FAULT_SHORT_VCC. Can also enable/disable all fault checks
+    using: TC_FAULT_ALL or TC_FAULT_NONE.
+*/
+/**************************************************************************/
+void MAX31855Class::setFaultChecks(uint8_t faults) {
+  _faultMask = faults & TC_FAULT_ALL;
 }

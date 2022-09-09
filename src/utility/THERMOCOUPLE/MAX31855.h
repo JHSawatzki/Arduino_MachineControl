@@ -27,6 +27,12 @@
 #define PROBE_K 0
 #define PROBE_J 1
 
+#define TC_FAULT_NONE (0x00)      ///< Disable all fault checks
+#define TC_FAULT_OPEN (0x01)      ///< Enable open circuit fault check
+#define TC_FAULT_SHORT_GND (0x02) ///< Enable short to GND fault check
+#define TC_FAULT_SHORT_VCC (0x04) ///< Enable short to VCC fault check
+#define TC_FAULT_ALL (0x07)       ///< Enable all fault checks
+
 class MAX31855Class {
 public:
   MAX31855Class(PinName cs = PI_0);
@@ -39,10 +45,14 @@ public:
   double readReferenceTemperature(int type = PROBE_K);
   void setColdOffset(double offset);
   double getColdOffset();
+  uint8_t getLastFault();
+  void setFaultChecks(uint8_t faults);
 
 private:
   uint32_t readSensor();
   double _coldOffset;
+  uint8_t _faultMask = TC_FAULT_ALL;
+  uint8_t _lastFault= 0;
   int _cs;
   SPIClass& _spi;
 
