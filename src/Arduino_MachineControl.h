@@ -13,6 +13,13 @@
 #include <pinDefinitions.h>
 #include <mbed.h>
 
+#if __has_include("portenta_info.h")
+#include "portenta_info.h"
+#define TRY_REV2_RECOGNITION
+uint8_t* boardInfo();
+#define PMC_R2_SKU  (24 << 8 | 3)
+#endif
+
 namespace machinecontrol {
 
 enum temperature_sensor_t : byte {TC, RTD};
@@ -29,6 +36,25 @@ public:
 	*  @param channel (0-2)
 	*/
 	void selectChannel(int channel, temperature_sensor_t temperature_sensor) {
+
+#ifdef TRY_REV2_RECOGNITION
+		// check if OTP data is present AND the board is mounted on a r2 carrier
+		auto info = (PortentaBoardInfo*)boardInfo();
+		if (info->magic == 0xB5 && info->carrier == PMC_R2_SKU) {
+			// reverse channels 0 and 2
+			switch (channel) {
+				case 0:
+					channel = 2;
+					break;
+				case 2:
+					channel = 0;
+					break;
+				default:
+					break;
+			}
+		}
+#endif
+
 		if (_current_channel != channel) {
 			for (int i = 0; i < 3; i++) {
 				_ch_sel[i] = (i == channel ? 1 : 0);
@@ -59,6 +85,25 @@ public:
 	*/
 	bool selectChannelAsync(int channel, temperature_sensor_t temperature_sensor) {
 		bool channel_selected = false;
+
+#ifdef TRY_REV2_RECOGNITION
+		// check if OTP data is present AND the board is mounted on a r2 carrier
+		auto info = (PortentaBoardInfo*)boardInfo();
+		if (info->magic == 0xB5 && info->carrier == PMC_R2_SKU) {
+			// reverse channels 0 and 2
+			switch (channel) {
+				case 0:
+					channel = 2;
+					break;
+				case 2:
+					channel = 0;
+					break;
+				default:
+					break;
+			}
+		}
+#endif
+#undef TRY_REV2_RECOGNITION
 
 		if (channel >= 0 && channel <= 2) {
 			if (_current_channel != channel) {
