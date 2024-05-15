@@ -178,6 +178,7 @@ double MAX31855Class::readVoltage(int type) {
   if (_lastFault) {
     return NAN;
   }
+
   // The cold junction temperature is stored in the last 14 word's bits 
   // whereas the thermocouple temperature (non linearized) is in the topmost 18 bits
   // sent by the Thermocouple-to-Digital Converter
@@ -215,7 +216,8 @@ double MAX31855Class::readVoltage(int type) {
   // calculated inverting the function above
   // this way we calculate the voltage we would have measured if cold junction 
   // was at 0 degrees celsius
-  measuredVolt = tempTomv(type, measuredCold - _coldOffset) + (measuredTemp - measuredCold) * 0.041276f;
+  measuredVolt = (measuredTemp - measuredCold) * 0.041276f;
+  measuredVolt += tempTomv(type, measuredCold - _coldOffset);
 
   return measuredVolt;
 }
