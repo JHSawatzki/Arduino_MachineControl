@@ -191,7 +191,7 @@ double MAX31855Class::readVoltage(int type) {
     return NAN; 
   }
   // The cold junction temperature is stored in the last 14 word's bits 
-  // whereas the ttermocouple temperature (non linearized) is in the topmost 18 bits
+  // whereas the thermocouple temperature (non linearized) is in the topmost 18 bits
   // sent by the Thermocouple-to-Digital Converter
 
   // sign extend thermocouple value
