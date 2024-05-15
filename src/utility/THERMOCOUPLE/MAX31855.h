@@ -51,6 +51,8 @@ public:
 
 private:
   uint32_t readSensor();
+  double decodeTemperatureSensorData(uint32_t rawword);
+  double decodeReferenceSensorData(uint32_t rawword);
   double _coldOffset;
   uint8_t _faultMask = TC_FAULT_ALL;
   uint8_t _lastFault= 0;

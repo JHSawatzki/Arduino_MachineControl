@@ -75,6 +75,46 @@ void MAX31855Class::end() {
   _spi.end();
 }
 
+double MAX31855Class::decodeTemperatureSensorData(uint32_t rawword) {
+  int32_t measuredTempInt;
+  double measuredTemp;
+
+  // The cold junction temperature is stored in the last 14 word's bits 
+  // whereas the thermocouple temperature (non linearized) is in the topmost 18 bits
+  // sent by the Thermocouple-to-Digital Converter
+
+  // sign extend thermocouple value
+  if (rawword & 0x80000000) {
+    // Negative value, drop the lower 18 bits and explicitly extend sign bits.
+    measuredTempInt = 0xFFFFC000 | ((rawword >> 18) & 0x00003FFF);
+  } else {
+    // Positive value, just drop the lower 18 bits.
+    measuredTempInt = rawword >> 18;
+  }
+
+  // convert it to degrees
+  measuredTemp = measuredTempInt * 0.25f;
+
+  return measuredTemp;
+}
+
+double MAX31855Class::decodeReferenceSensorData(uint32_t rawword) {
+  int32_t measuredColdInt;
+  double measuredCold;
+
+  // sign extend cold junction temperature
+  measuredColdInt = (rawword >>4) & 0xfff;
+  if (measuredColdInt & 0x800) {
+    // Negative value, sign extend
+    measuredColdInt |= 0xfffff000;
+  }
+
+  // convert it to degrees
+  measuredCold = (measuredColdInt / 16.0f);
+
+  return measuredCold;
+}
+
 uint32_t MAX31855Class::readSensor() {
   uint32_t read = 0x00;
 
@@ -165,9 +205,6 @@ double MAX31855Class::mvtoTemp(int type, double voltage) {
 
 double MAX31855Class::readVoltage(int type) {
   uint32_t rawword;
-  int32_t measuredTempInt;
-  int32_t measuredColdInt;
-  double measuredTemp;
   double measuredCold;
   double measuredVolt;
 
@@ -178,32 +215,6 @@ double MAX31855Class::readVoltage(int type) {
   if (_lastFault) {
     return NAN;
   }
-
-  // The cold junction temperature is stored in the last 14 word's bits 
-  // whereas the thermocouple temperature (non linearized) is in the topmost 18 bits
-  // sent by the Thermocouple-to-Digital Converter
-
-  // sign extend thermocouple value
-  if (rawword & 0x80000000) {
-    // Negative value, drop the lower 18 bits and explicitly extend sign bits.
-    measuredTempInt = 0xFFFFC000 | ((rawword >> 18) & 0x00003FFF);
-  } else {
-    // Positive value, just drop the lower 18 bits.
-    measuredTempInt = rawword >> 18;
-  }
-
-  // convert it to degrees
-  measuredTemp = measuredTempInt * 0.25f;
-
-  // sign extend cold junction temperature
-  measuredColdInt = (rawword >>4) & 0xfff;
-  if (measuredColdInt & 0x800) {
-    // Negative value, sign extend
-    measuredColdInt |= 0xfffff000;
-  }
-
-  // convert it to degrees
-  measuredCold = (measuredColdInt / 16.0f);
 
   // now the tricky part... since MAX31855K is considering a linear response 
   // and is trimemd for K thermocouples, we have to convert the reading back
@@ -216,7 +227,8 @@ double MAX31855Class::readVoltage(int type) {
   // calculated inverting the function above
   // this way we calculate the voltage we would have measured if cold junction 
   // was at 0 degrees celsius
-  measuredVolt = (measuredTemp - measuredCold) * 0.041276f;
+  measuredCold = decodeReferenceSensorData(rawword);
+  measuredVolt = (decodeTemperatureSensorData(rawword) - measuredCold) * 0.041276f;
   measuredVolt += tempTomv(type, measuredCold - _coldOffset);
 
   return measuredVolt;
@@ -231,23 +243,7 @@ double MAX31855Class::readTemperature(int type) {
 }
 
 double MAX31855Class::readReferenceTemperature(int type) {
-  uint32_t rawword;
-  int32_t measuredColdInt;
-  double measuredCold;
-
-  rawword = readSensor();
-
-  // sign extend cold junction temperature
-  measuredColdInt = (rawword >>4) & 0xfff;
-  if (measuredColdInt & 0x800) {
-    // Negative value, sign extend
-    measuredColdInt |= 0xfffff000;
-  }
-
-  // convert it to degrees
-  measuredCold = (measuredColdInt / 16.0f);
-
-  return measuredCold;
+  return decodeReferenceSensorData(readSensor());
 }
 
 void MAX31855Class::setColdOffset(double offset) {
