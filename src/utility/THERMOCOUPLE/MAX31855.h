@@ -93,8 +93,9 @@ private:
 
   static constexpr coefftable CoeffK []= {
     {0,-270, NULL},
-    {sizeof(Jm210_760) / sizeof(double), 0.0f, &Km270_0[0]},
-    {sizeof(K0_1372) / sizeof(double), 1200.0f, &K0_1372[0]}
+    {sizeof(Km270_0) / sizeof(double), 0.0f, &Km270_0[0]},
+    {sizeof(K0_1372) / sizeof(double), 1372.0f, &K0_1372[0]}
+  };
 
   static constexpr coefftable CoeffT []= {
     {0,-270, NULL},
