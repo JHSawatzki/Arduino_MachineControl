@@ -24,8 +24,12 @@
 
 const double MAX31855Class::Jm210_760[];
 const double MAX31855Class::J760_1200[];
+
 const double MAX31855Class::Km270_0[];
 const double MAX31855Class::K0_1372[];
+
+const double MAX31855Class::Tm270_0[];
+const double MAX31855Class::T0_400[];
 
 const double MAX31855Class::InvJ_neg[];
 const double MAX31855Class::InvJ0_760[];
@@ -35,11 +39,16 @@ const double MAX31855Class::InvK_neg[];
 const double MAX31855Class::InvK0_500[];
 const double MAX31855Class::InvK500_1372[];
 
+const double MAX31855Class::InvT_m200_0[];
+const double MAX31855Class::InvT0_400[];
+
 const MAX31855Class::coefftable MAX31855Class::CoeffJ[];
 const MAX31855Class::coefftable MAX31855Class::CoeffK[];
+const MAX31855Class::coefftable MAX31855Class::CoeffT[];
 
 const MAX31855Class::coefftable MAX31855Class::InvCoeffJ[];
 const MAX31855Class::coefftable MAX31855Class::InvCoeffK[];
+const MAX31855Class::coefftable MAX31855Class::InvCoeffT[];
 
 MAX31855Class::MAX31855Class(PinName cs) : _spi(SPI), _cs(cs), _coldOffset(2.10f) {
 }
@@ -125,6 +134,10 @@ double MAX31855Class::tempTomv(int type, double temp) {
       table = CoeffK;
       tableEntries = sizeof(CoeffK) / sizeof(coefftable);
     break;
+    case PROBE_T:
+      table = CoeffT;
+      tableEntries = sizeof(CoeffT) / sizeof(coefftable);
+    break;
   }
   voltage = polynomial(temp, tableEntries, table);
   // special case... for K probes in temperature range 0-1372 we need
@@ -147,6 +160,10 @@ double MAX31855Class::mvtoTemp(int type, double voltage) {
     case PROBE_K:
       table = InvCoeffK;
       tableEntries = sizeof(InvCoeffK) / sizeof(coefftable);
+    break;
+    case PROBE_T:
+      table = InvCoeffT;
+      tableEntries = sizeof(InvCoeffT) / sizeof(coefftable);
     break;
   }
   return polynomial(voltage, tableEntries, table);
