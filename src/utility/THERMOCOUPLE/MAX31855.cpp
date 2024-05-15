@@ -19,9 +19,6 @@
 
 #include "MAX31855.h"
 
-//#include <Arduino_MachineControl.h>
-//using namespace machinecontrol;
-
 const double MAX31855Class::Jm210_760[];
 const double MAX31855Class::J760_1200[];
 
@@ -64,9 +61,6 @@ int MAX31855Class::begin() {
 
   rawword = readSensor();
   if (rawword == 0xFFFFFF) {
-    //comm_protocols.rs485.beginTransmission();
-    //comm_protocols.rs485.println("TC begin error");
-    //comm_protocols.rs485.endTransmission();
     end();
 
     return 0;
@@ -177,18 +171,12 @@ double MAX31855Class::readVoltage(int type) {
   double measuredCold;
   double measuredVolt;
 
-  //comm_protocols.rs485.beginTransmission();
-  //comm_protocols.rs485.println("Read TC");
-  //comm_protocols.rs485.endTransmission();
   rawword = readSensor();
 
   _lastFault = rawword & _faultMask;
   // Check for reading error
   if (_lastFault) {
-    //comm_protocols.rs485.beginTransmission();
-    //comm_protocols.rs485.println("TC reading error");
-    //comm_protocols.rs485.endTransmission();
-    return NAN; 
+    return NAN;
   }
   // The cold junction temperature is stored in the last 14 word's bits 
   // whereas the thermocouple temperature (non linearized) is in the topmost 18 bits
@@ -205,10 +193,6 @@ double MAX31855Class::readVoltage(int type) {
 
   // convert it to degrees
   measuredTemp = measuredTempInt * 0.25f;
-  //comm_protocols.rs485.beginTransmission();
-  //comm_protocols.rs485.print("Measured Temp: ");
-  //comm_protocols.rs485.println(measuredTemp);
-  //comm_protocols.rs485.endTransmission();
 
   // sign extend cold junction temperature
   measuredColdInt = (rawword >>4) & 0xfff;
@@ -219,10 +203,6 @@ double MAX31855Class::readVoltage(int type) {
 
   // convert it to degrees
   measuredCold = (measuredColdInt / 16.0f);
-  //comm_protocols.rs485.beginTransmission();
-  //comm_protocols.rs485.print("Measured CJC: ");
-  //comm_protocols.rs485.println(measuredCold);
-  //comm_protocols.rs485.endTransmission();
 
   // now the tricky part... since MAX31855K is considering a linear response 
   // and is trimemd for K thermocouples, we have to convert the reading back
