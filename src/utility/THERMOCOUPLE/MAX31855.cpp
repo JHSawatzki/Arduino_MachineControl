@@ -230,25 +230,22 @@ double MAX31855Class::readTemperature(int type) {
 
 double MAX31855Class::readReferenceTemperature(int type) {
   uint32_t rawword;
-  double reference;
+  int32_t measuredColdInt;
+  double measuredCold;
 
   rawword = readSensor();
 
-  // ignore first 4 FAULT bits
-  rawword >>= 4;
-
-  // The cold junction reference temperature is stored in the first 11 word's bits
-  // sent by the Thermocouple-to-Digital Converter
-  rawword = rawword & 0x7FF;
-  // check sign bit  and convert to negative value.
-  if (rawword & 0x800) {
-    reference = (0xF800 | (rawword & 0x7FF)) * 0.0625f;
-  } else {
-    // multiply for the LSB value
-    reference = rawword * 0.0625f;
+  // sign extend cold junction temperature
+  measuredColdInt = (rawword >>4) & 0xfff;
+  if (measuredColdInt & 0x800) {
+    // Negative value, sign extend
+    measuredColdInt |= 0xfffff000;
   }
 
-  return reference;
+  // convert it to degrees
+  measuredCold = (measuredColdInt / 16.0f);
+
+  return measuredCold;
 }
 
 void MAX31855Class::setColdOffset(double offset) {
