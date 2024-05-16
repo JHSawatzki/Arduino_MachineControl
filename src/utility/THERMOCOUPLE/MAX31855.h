@@ -56,7 +56,7 @@ private:
   double _coldOffset;
   uint8_t _faultMask = TC_FAULT_ALL;
   uint8_t _lastFault= 0;
-  int _cs;
+  PinName _cs;
   SPIClass& _spi;
 
   // NIST coefficient tables
